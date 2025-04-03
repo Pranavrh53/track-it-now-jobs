@@ -6,7 +6,7 @@ import JobList from '@/components/JobList';
 import JobStats from '@/components/JobStats';
 import KanbanBoard from '@/components/KanbanBoard';
 import { Button } from '@/components/ui/button';
-import { LayoutList, LayoutKanban } from 'lucide-react';
+import { LayoutList, Columns } from 'lucide-react';
 
 const Index = () => {
   const { jobs } = useJobContext();
@@ -42,7 +42,7 @@ const Index = () => {
               onClick={() => setViewType('kanban')}
               className="flex items-center gap-1"
             >
-              <LayoutKanban className="h-4 w-4" />
+              <Columns className="h-4 w-4" />
               Kanban
             </Button>
           </div>
