@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Plus, Briefcase } from 'lucide-react';
+import { Plus, Briefcase, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
@@ -12,7 +12,16 @@ const Navbar = () => {
           <span className="text-xl font-bold text-gray-800">Track It Now</span>
         </Link>
         
-        <nav>
+        <nav className="flex items-center space-x-4">
+          <a 
+            href="https://www.ibm.com/certifications" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+          >
+            <ExternalLink className="h-4 w-4" />
+            <span>IBM Certificates</span>
+          </a>
           <Link to="/add">
             <Button size="sm" className="flex items-center gap-1">
               <Plus className="h-4 w-4" />
