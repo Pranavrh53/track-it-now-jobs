@@ -7,6 +7,8 @@ import JobStats from '@/components/JobStats';
 import KanbanBoard from '@/components/KanbanBoard';
 import { Button } from '@/components/ui/button';
 import { LayoutList, Columns } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { InfoIcon } from "lucide-react";
 
 const Index = () => {
   const { jobs } = useJobContext();
@@ -48,6 +50,14 @@ const Index = () => {
           </div>
         </div>
       </div>
+      
+      <Alert className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
+        <InfoIcon className="h-4 w-4" />
+        <AlertTitle>Job Search Feature Coming Soon</AlertTitle>
+        <AlertDescription>
+          We're working on integrating live job listings from external sources. This feature will allow you to search, filter, and apply to jobs directly from this dashboard.
+        </AlertDescription>
+      </Alert>
       
       <JobStats />
       
