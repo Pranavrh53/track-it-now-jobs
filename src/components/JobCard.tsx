@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Calendar, Building, User, Edit, Trash2, MapPin, DollarSign, Briefcase, Mail } from "lucide-react";
+import { Calendar, Building, User, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/StatusBadge";
@@ -18,7 +18,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 
 interface JobCardProps {
   job: Job;
@@ -33,14 +32,6 @@ const JobCard = ({ job }: JobCardProps) => {
     } catch (error) {
       return dateString;
     }
-  };
-
-  // Check if today is past the follow-up date
-  const isFollowUpOverdue = () => {
-    if (!job.followUpDate) return false;
-    const followUpDate = new Date(job.followUpDate);
-    const today = new Date();
-    return followUpDate < today;
   };
 
   return (
@@ -66,48 +57,6 @@ const JobCard = ({ job }: JobCardProps) => {
             <div className="flex items-center gap-2 text-muted-foreground">
               <User className="h-4 w-4" />
               <span>{job.contactPerson}</span>
-            </div>
-          )}
-
-          {job.location && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-2 mt-1">
-            {job.jobType && (
-              <Badge variant="outline" className="text-xs">
-                <Briefcase className="h-3 w-3 mr-1" />
-                {job.jobType}
-              </Badge>
-            )}
-            
-            {job.salary && (
-              <Badge variant="outline" className="text-xs">
-                <DollarSign className="h-3 w-3 mr-1" />
-                {job.salary}
-              </Badge>
-            )}
-            
-            {job.applicationMethod && (
-              <Badge variant="outline" className="text-xs">
-                <Mail className="h-3 w-3 mr-1" />
-                {job.applicationMethod}
-              </Badge>
-            )}
-          </div>
-
-          {job.followUpDate && (
-            <div className="flex items-center gap-2 mt-1">
-              <Badge 
-                variant={isFollowUpOverdue() ? "destructive" : "secondary"}
-                className="text-xs"
-              >
-                Follow-up: {formattedDate(job.followUpDate)}
-                {isFollowUpOverdue() && " (Overdue)"}
-              </Badge>
             </div>
           )}
           

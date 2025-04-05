@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Job, JobFormData, JobStatus, JobType } from '@/types/job';
+import { Job, JobFormData, JobStatus } from '@/types/job';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -12,16 +12,6 @@ interface JobContextType {
   getJob: (id: string) => Job | undefined;
   getJobsByStatus: (status: JobStatus | 'All') => Job[];
   getPopularCompanies: () => string[];
-  getJobsByType: (jobType: JobType | 'All') => Job[];
-  getJobStatistics: () => JobStatistics;
-}
-
-interface JobStatistics {
-  totalJobs: number;
-  jobsByStatus: Record<JobStatus, number>;
-  jobsByType: Record<string, number>;
-  averageResponseTime: number | null;
-  applicationsByMonth: Record<string, number>;
 }
 
 const JobContext = createContext<JobContextType | null>(null);
@@ -108,81 +98,11 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
     if (status === 'All') return jobs;
     return jobs.filter(job => job.status === status);
   };
-
-  const getJobsByType = (jobType: JobType | 'All') => {
-    if (jobType === 'All') return jobs;
-    return jobs.filter(job => job.jobType === jobType);
-  };
   
   const getPopularCompanies = () => {
     const companies = jobs.map(job => job.company);
     // Get unique company names
     return [...new Set(companies)];
-  };
-
-  const getJobStatistics = () => {
-    // Initialize statistics object
-    const statistics: JobStatistics = {
-      totalJobs: jobs.length,
-      jobsByStatus: {
-        'Applied': 0,
-        'Interview': 0,
-        'Offer': 0,
-        'Rejected': 0
-      },
-      jobsByType: {},
-      averageResponseTime: null,
-      applicationsByMonth: {}
-    };
-
-    if (jobs.length === 0) return statistics;
-
-    // Count jobs by status
-    jobs.forEach(job => {
-      statistics.jobsByStatus[job.status]++;
-      
-      // Count jobs by type
-      if (job.jobType) {
-        if (!statistics.jobsByType[job.jobType]) {
-          statistics.jobsByType[job.jobType] = 0;
-        }
-        statistics.jobsByType[job.jobType]++;
-      }
-
-      // Group applications by month
-      const applicationMonth = job.applicationDate.substring(0, 7); // YYYY-MM
-      if (!statistics.applicationsByMonth[applicationMonth]) {
-        statistics.applicationsByMonth[applicationMonth] = 0;
-      }
-      statistics.applicationsByMonth[applicationMonth]++;
-    });
-
-    // Calculate average response time for interviews
-    const interviewJobs = jobs.filter(job => 
-      job.status === 'Interview' || job.status === 'Offer'
-    );
-    
-    if (interviewJobs.length > 0) {
-      let totalDays = 0;
-      let validResponses = 0;
-      
-      interviewJobs.forEach(job => {
-        const applicationDate = new Date(job.applicationDate);
-        const updatedDate = new Date(job.updatedAt);
-        const daysDifference = Math.floor((updatedDate.getTime() - applicationDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (daysDifference >= 0) {
-          totalDays += daysDifference;
-          validResponses++;
-        }
-      });
-      
-      if (validResponses > 0) {
-        statistics.averageResponseTime = Math.round(totalDays / validResponses);
-      }
-    }
-
-    return statistics;
   };
   
   return (
@@ -193,9 +113,7 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
       deleteJob, 
       getJob,
       getJobsByStatus,
-      getPopularCompanies,
-      getJobsByType,
-      getJobStatistics
+      getPopularCompanies
     }}>
       {children}
     </JobContext.Provider>
