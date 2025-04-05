@@ -3,7 +3,6 @@ export type JobStatus = 'Applied' | 'Interview' | 'Offer' | 'Rejected';
 
 export interface Job {
   id: string;
-  userId: string; // Added userId to associate jobs with users
   title: string;
   company: string;
   applicationDate: string;
@@ -23,9 +22,4 @@ export interface JobFormData {
   contactPerson?: string;
   contactEmail?: string;
   notes?: string;
-}
-
-export interface Company {
-  id: string;
-  name: string;
 }
