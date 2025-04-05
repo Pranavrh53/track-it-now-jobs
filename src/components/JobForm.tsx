@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Job, JobFormData, JobStatus } from "@/types/job";
 import { format } from 'date-fns';
+import { useJobContext } from "@/contexts/JobContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Job title is required"),
@@ -41,6 +42,8 @@ interface JobFormProps {
 
 const JobForm = ({ initialData, onSubmit, isSubmitting }: JobFormProps) => {
   const today = format(new Date(), 'yyyy-MM-dd');
+  const { getPopularCompanies } = useJobContext();
+  const popularCompanies = getPopularCompanies();
   
   const form = useForm<JobFormData>({
     resolver: zodResolver(formSchema),
@@ -93,9 +96,40 @@ const JobForm = ({ initialData, onSubmit, isSubmitting }: JobFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Company*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Acme Inc." {...field} />
-                </FormControl>
+                {popularCompanies.length > 0 ? (
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select or type a company" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {popularCompanies.map((company) => (
+                        <SelectItem key={company} value={company}>
+                          {company}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="other">Other (Type below)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <FormControl>
+                    <Input placeholder="Acme Inc." {...field} />
+                  </FormControl>
+                )}
+                {field.value === 'other' && (
+                  <FormControl>
+                    <Input
+                      placeholder="Enter company name"
+                      className="mt-2"
+                      onChange={(e) => form.setValue('company', e.target.value)}
+                    />
+                  </FormControl>
+                )}
                 <FormMessage />
               </FormItem>
             )}

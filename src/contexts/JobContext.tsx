@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Job, JobFormData, JobStatus } from '@/types/job';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 interface JobContextType {
@@ -10,6 +11,7 @@ interface JobContextType {
   deleteJob: (id: string) => void;
   getJob: (id: string) => Job | undefined;
   getJobsByStatus: (status: JobStatus | 'All') => Job[];
+  getPopularCompanies: () => string[];
 }
 
 const JobContext = createContext<JobContextType | null>(null);
@@ -24,29 +26,44 @@ export const useJobContext = () => {
 
 export const JobProvider = ({ children }: { children: ReactNode }) => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const { authState } = useAuthContext();
+  const userId = authState.user?.id || '';
   
   // Load jobs from localStorage on initial render
   useEffect(() => {
-    const storedJobs = localStorage.getItem('jobs');
+    if (!userId) {
+      setJobs([]);
+      return;
+    }
+    
+    const storedJobs = localStorage.getItem(`jobs_${userId}`);
     if (storedJobs) {
       try {
         setJobs(JSON.parse(storedJobs));
       } catch (error) {
         console.error('Failed to parse jobs from localStorage', error);
-        localStorage.removeItem('jobs');
+        localStorage.removeItem(`jobs_${userId}`);
       }
     }
-  }, []);
+  }, [userId]);
   
   // Save jobs to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('jobs', JSON.stringify(jobs));
-  }, [jobs]);
+    if (!userId) return;
+    
+    localStorage.setItem(`jobs_${userId}`, JSON.stringify(jobs));
+  }, [jobs, userId]);
   
   const addJob = (jobData: JobFormData): string => {
+    if (!userId) {
+      toast.error('You must be logged in to add jobs');
+      return '';
+    }
+    
     const now = new Date().toISOString();
     const newJob: Job = {
       id: crypto.randomUUID(),
+      userId,
       ...jobData,
       createdAt: now,
       updatedAt: now
@@ -82,6 +99,12 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
     return jobs.filter(job => job.status === status);
   };
   
+  const getPopularCompanies = () => {
+    const companies = jobs.map(job => job.company);
+    // Get unique company names
+    return [...new Set(companies)];
+  };
+  
   return (
     <JobContext.Provider value={{ 
       jobs, 
@@ -89,7 +112,8 @@ export const JobProvider = ({ children }: { children: ReactNode }) => {
       updateJob, 
       deleteJob, 
       getJob,
-      getJobsByStatus
+      getJobsByStatus,
+      getPopularCompanies
     }}>
       {children}
     </JobContext.Provider>
