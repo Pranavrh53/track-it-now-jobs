@@ -11,6 +11,7 @@ import Navbar from './components/Navbar';
 import Index from "./pages/Index";
 import AddJob from "./pages/AddJob";
 import EditJob from "./pages/EditJob";
+import Search from "./pages/Search"; // Add the import for the new Search page
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
@@ -54,6 +55,11 @@ const App = () => {
                     <Route path="/edit/:id" element={
                       <ProtectedRoute>
                         <EditJob />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/search" element={
+                      <ProtectedRoute>
+                        <Search />
                       </ProtectedRoute>
                     } />
                     <Route path="/404" element={<NotFound />} />
